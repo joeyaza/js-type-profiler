@@ -1,0 +1,14 @@
+{
+  "name": "type-profile",
+  "version": "1.0.0",
+  "description": "Collect runtime type information 😋 of your JavaScript code.",
+  "main": "app.js",
+  "scripts": {
+  "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "author": "Joe Az"
+}
