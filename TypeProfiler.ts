@@ -1,4 +1,4 @@
-const InspectorSession = require('./InspectorSession');
+import {InspectorSession} from './InspectorSession';
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
@@ -11,15 +11,17 @@ class TypeProfiler {
 
     }
 
-    start() {
+    start(): Promise<string>  {
 
-        this.readFile("./ex.js").then((script)=> {
+        return this.readFile("./ex.js").then((script)=> {
 
-            this.collectTypeProfile(script).then((profile) => {
+            return this.collectTypeProfile(script).then((profile) => {
 
                 const profileInfo = JSON.stringify(this.markUpCode(profile, script));
 
-                    console.log(profileInfo);
+                console.log(profileInfo);
+
+                return profileInfo;
 
             });
 

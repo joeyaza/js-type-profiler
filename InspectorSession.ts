@@ -1,6 +1,6 @@
 const inspector = require('inspector');
 
-class InspectorSession extends inspector.Session {
+export class InspectorSession extends inspector.Session {
 
   constructor() {
 
@@ -8,7 +8,7 @@ class InspectorSession extends inspector.Session {
 
   }
 
-  postAsync(...args) {
+  postAsync(...args): Promise<any> {
 
     let session = this;
 
@@ -38,5 +38,3 @@ class InspectorSession extends inspector.Session {
 
 
 }
-
-module.exports = InspectorSession;
