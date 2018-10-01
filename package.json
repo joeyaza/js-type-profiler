@@ -7,7 +7,7 @@
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "dev": "tsc -w & nodemon dist/app.js"
+    "dev": "tsc -w & nodemon dist/src/app.js"
   },
   "repository": {
     "type": "git"

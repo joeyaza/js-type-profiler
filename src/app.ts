@@ -1,5 +1,5 @@
 'use strict';
-const TypeProfiler = require("./TypeProfiler");
+const TypeProfiler = require("./TypeProfiler/TypeProfiler");
 
 const typeProfiler = new TypeProfiler();
 

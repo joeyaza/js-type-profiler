@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const InspectorSession_1 = require("./InspectorSession");
+const InspectorSession_1 = require("../InspectorSession/InspectorSession");
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
@@ -17,7 +17,7 @@ class TypeProfiler {
     constructor() {
     }
     start() {
-        return this.readFile("dist/ex.js").then((script) => {
+        return this.readFile("dist/src/ex.js").then((script) => {
             return this.collectTypeProfile(script).then((profile) => {
                 const profileInfo = this.markUpCode(profile, script);
                 console.log(profileInfo);
@@ -25,9 +25,9 @@ class TypeProfiler {
             });
         });
     }
-    readFile(file_name) {
+    readFile(fileName) {
         return new Promise((resolve, reject) => {
-            fs.readFile(file_name, "utf8", (error, result) => {
+            fs.readFile(fileName, "utf8", (error, result) => {
                 if (error) {
                     reject(error);
                 }

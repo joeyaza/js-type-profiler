@@ -1,4 +1,4 @@
-import {InspectorSession} from './InspectorSession';
+import {InspectorSession} from '../InspectorSession/InspectorSession';
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
@@ -13,7 +13,7 @@ class TypeProfiler {
 
     public start(): Promise<any>  {
 
-        return this.readFile("dist/ex.js").then((script)=> {
+        return this.readFile("dist/src/ex.js").then((script)=> {
 
             return this.collectTypeProfile(script).then((profile) => {
 
@@ -29,13 +29,13 @@ class TypeProfiler {
 
     }
 
-    private readFile(file_name): Promise<any> {
+    private readFile(fileName): Promise<any> {
 
       return new Promise(
 
         (resolve, reject) => {
 
-          fs.readFile(file_name, "utf8", (error, result) => {
+          fs.readFile(fileName, "utf8", (error, result) => {
 
             if (error) {
 
