@@ -8,13 +8,13 @@ export class InspectorSession extends inspector.Session {
 
   }
 
-  postAsync(...args): Promise<any> {
+  public postAsync(...args): Promise<any> {
 
     let session = this;
 
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
 
-      session.post(...args, function(error, result) {
+      session.post(...args, (error, result) => {
 
         if (error !== null) {
 

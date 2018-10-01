@@ -11,13 +11,13 @@ class TypeProfiler {
 
     }
 
-    start(): Promise<string>  {
+    public start(): Promise<any>  {
 
-        return this.readFile("./ex.js").then((script)=> {
+        return this.readFile("dist/ex.js").then((script)=> {
 
             return this.collectTypeProfile(script).then((profile) => {
 
-                const profileInfo = JSON.stringify(this.markUpCode(profile, script));
+                const profileInfo = this.markUpCode(profile, script);
 
                 console.log(profileInfo);
 
@@ -29,13 +29,13 @@ class TypeProfiler {
 
     }
 
-    readFile(file_name) {
+    private readFile(file_name): Promise<any> {
 
       return new Promise(
 
-        function(resolve, reject) {
+        (resolve, reject) => {
 
-          fs.readFile(file_name, "utf8", function(error, result) {
+          fs.readFile(file_name, "utf8", (error, result) => {
 
             if (error) {
 
@@ -53,16 +53,15 @@ class TypeProfiler {
 
     }
 
-    async collectTypeProfile(source) {
+    private async collectTypeProfile(source: string) : Promise<any> {
 
-        let typeProfile = "";
+        let typeProfile;
         
         try {
 
             inspectorSession.connect();
 
     // Enable relevant inspector domains.
-
             await inspectorSession.postAsync('Runtime.enable');
             await inspectorSession.postAsync('Profiler.enable');
             await inspectorSession.postAsync('Profiler.startTypeProfile');
@@ -73,51 +72,41 @@ class TypeProfiler {
                 sourceURL: "test",
                 persistScript: true
             });
+
     // Execute script.
             await inspectorSession.postAsync('Runtime.runScript', { scriptId });
 
             let { result } = await inspectorSession.postAsync('Profiler.takeTypeProfile');
 
-            [{ entries: typeProfile }] = result.filter(x => x.scriptId == scriptId);  
+            typeProfile = result.filter((typeResults) => {
+
+                return typeResults.scriptId == scriptId;
+
+            });  
 
         } finally {
-    // Close inspectorSession and return.
 
+    // Close inspectorSession and return.
             inspectorSession.disconnect();
 
         }
 
-        return typeProfile;
+        return typeProfile[0].entries;
 
     }
 
-    markUpCode(entries, source) {
+    private markUpCode(entries: any, source:string): string {
 
-          entries = entries.sort((a, b) => b.offset - a.offset);
+        entries = entries.sort((a, b) => b.offset - a.offset);
 
-          for (let entry of entries) {
+        for (let entry of entries) {
 
             source = source.slice(0, entry.offset) + entry.types +
-              source.slice(entry.offset);
+                source.slice(entry.offset);
 
           }
 
           return source;
-
-    }
-
-
-    getPostBody(request) {
-
-        return new Promise(function(resolve) {
-
-            let body = "";
-
-            request.on('data', data => body += data);
-
-            request.on('end', end => resolve(query.parse(body)));
-
-        });
 
     }
 

@@ -7,13 +7,23 @@
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "dev": "npm run tsc && nodemon dist/app.js"
+    "dev": "tsc -w & nodemon dist/app.js"
   },
   "repository": {
     "type": "git"
   },
   "author": "Joe Az",
   "dependencies": {
-    "@types/node": "^10.11.3"
+    "@types/node": "^10.11.3",
+    "@types/chai": "4.1.5",
+    "@types/chai-as-promised": "7.1.0",
+    "@types/mocha": "5.2.5",
+    "@types/sinon": "^5.0.2",
+    "@types/sinon-chai": "3.2.0",
+    "typescript": "*",
+    "chai": "4.1.2",
+    "mocha": "^3.5.0",
+    "sinon": "^3.2.1",
+    "sinon-chai": "^2.13.0"
   }
 }

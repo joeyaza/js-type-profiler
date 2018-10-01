@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -6,26 +7,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const InspectorSession = require('./InspectorSession');
+Object.defineProperty(exports, "__esModule", { value: true });
+const InspectorSession_1 = require("./InspectorSession");
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
-const inspectorSession = new InspectorSession();
+const inspectorSession = new InspectorSession_1.InspectorSession();
 class TypeProfiler {
     constructor() {
     }
     start() {
-        return this.readFile("./ex.js").then((script) => {
+        return this.readFile("dist/ex.js").then((script) => {
             return this.collectTypeProfile(script).then((profile) => {
-                const profileInfo = JSON.stringify(this.markUpCode(profile, script));
+                const profileInfo = this.markUpCode(profile, script);
                 console.log(profileInfo);
                 return profileInfo;
             });
         });
     }
     readFile(file_name) {
-        return new Promise(function (resolve, reject) {
-            fs.readFile(file_name, "utf8", function (error, result) {
+        return new Promise((resolve, reject) => {
+            fs.readFile(file_name, "utf8", (error, result) => {
                 if (error) {
                     reject(error);
                 }
@@ -37,7 +39,7 @@ class TypeProfiler {
     }
     collectTypeProfile(source) {
         return __awaiter(this, void 0, void 0, function* () {
-            let typeProfile = "";
+            let typeProfile;
             try {
                 inspectorSession.connect();
                 yield inspectorSession.postAsync('Runtime.enable');
@@ -50,12 +52,14 @@ class TypeProfiler {
                 });
                 yield inspectorSession.postAsync('Runtime.runScript', { scriptId });
                 let { result } = yield inspectorSession.postAsync('Profiler.takeTypeProfile');
-                [{ entries: typeProfile }] = result.filter(x => x.scriptId == scriptId);
+                typeProfile = result.filter((typeResults) => {
+                    return typeResults.scriptId == scriptId;
+                });
             }
             finally {
                 inspectorSession.disconnect();
             }
-            return typeProfile;
+            return typeProfile[0].entries;
         });
     }
     markUpCode(entries, source) {
@@ -65,13 +69,6 @@ class TypeProfiler {
                 source.slice(entry.offset);
         }
         return source;
-    }
-    getPostBody(request) {
-        return new Promise(function (resolve) {
-            let body = "";
-            request.on('data', data => body += data);
-            request.on('end', end => resolve(query.parse(body)));
-        });
     }
 }
 module.exports = TypeProfiler;
