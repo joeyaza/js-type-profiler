@@ -1,6 +1,9 @@
 'use strict';
-const TypeProfiler = require("./TypeProfiler/TypeProfiler");
-
+import {TypeProfiler} from './TypeProfiler/TypeProfiler';
+import * as http from "http";
 const typeProfiler = new TypeProfiler();
 
-typeProfiler.start();
+// typeProfiler.start();
+
+http.createServer(typeProfiler.server).listen(8080);
+console.log("Listening on localhost:8080");

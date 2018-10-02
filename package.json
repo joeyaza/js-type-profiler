@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run tsc && mocha ./dist/src/*/*.spec.js",
     "tsc": "tsc",
     "dev": "tsc -w & nodemon dist/src/app.js"
   },

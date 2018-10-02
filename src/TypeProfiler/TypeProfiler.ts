@@ -5,27 +5,42 @@ const fs = require('fs');
 const inspectorSession = new InspectorSession();
 
 
-class TypeProfiler {
+export class TypeProfiler {
 
     constructor() {
 
     }
 
-    public start(): Promise<any>  {
+    public start(script?: string): Promise<any>  {
 
-        return this.readFile("dist/src/ex.js").then((script)=> {
+        if (!script) {
 
-            return this.collectTypeProfile(script).then((profile) => {
+            return this.readFile("dist/src/ex.js").then((script)=> {
 
-                const profileInfo = this.markUpCode(profile, script);
+                return this.collectTypeProfile(script).then((profile) => {
 
-                console.log(profileInfo);
+                    const profileInfo = this.markUpCode(profile, script);
 
-                return profileInfo;
+                    // console.log(profileInfo);
+
+                    return profileInfo;
+
+                });
 
             });
 
+        }
+
+        return this.collectTypeProfile(script).then((profile) => {
+
+            const profileInfo = this.markUpCode(profile, script);
+
+            // console.log(profileInfo);
+
+            return profileInfo;
+
         });
+
 
     }
 
@@ -110,7 +125,88 @@ class TypeProfiler {
 
     }
 
+
+    private async getPostBody(request) {
+
+        return new Promise(function(resolve) {
+
+           let body = "";
+           request.on('data', data => body += data);
+           request.on('end', end => resolve(query.parse(body)));
+
+      });
+
+    }
+
+
+    private async server(request, response) {
+
+        console.log("here §§§§§")
+
+          let script = "",
+              result = "",
+              message_log = "",
+              detailed = false,
+              count = false;
+
+          if (request.method == 'POST') {
+
+              console.log("here !")
+
+            // Collect type profile on the script from input form.
+            try {
+
+              let post = await this.getPostBody(request);
+
+              script = post.script;
+
+              let typeProfile = await collectTypeProfile(script);
+
+              result = markUpCode(typeProfile, script);
+
+            } catch (error) {
+              
+              return error;
+
+            }
+
+          } else {
+
+              console.log("hdkjhkdjhkdjkjd")
+            // Use example file.
+
+            this.readFile("dist/src/ex.js").then((script) => {
+
+                this.readFile("index.html").then((template) => {
+
+                    let html = [
+                        ["SCRIPT", script],
+                        ["RESULT", result]
+                      ].reduce((template, [pattern, replacement]) => {
+
+                        return template.replace(pattern, replacement);
+
+                    }, template);
+
+                      response.writeHead(200, {
+
+                        'Content-Type': 'text/html'
+
+                      });
+
+                      response.end(html);
+
+                });
+
+            });
+
+          }
+
+ 
+        
+    }
+
 }
 
 
-module.exports = TypeProfiler;
+// module.exports = TypeProfiler;
