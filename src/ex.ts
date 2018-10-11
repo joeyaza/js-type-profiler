@@ -14,8 +14,3 @@
   foo("some string");
   foo(new Rectangle());
 })();
-// Return type of the script itself.
-
-
-// - grab code to profile
-// - 

@@ -1,30 +1,44 @@
 import {expect, use} from "chai";
+import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
 import * as util from "util";
 
-import {TypeProfiler} from './TypeProfiler';
+const TypeProfiler = require("./TypeProfiler");
+const typeProfiler = new TypeProfiler();
 
 use(sinonChai);
 
 describe("TypeProfiler", () => {
 
-	const typeProfiler = new TypeProfiler();
+	let collectTypeProfileSpy;
 
-	describe("when asked to get type profiling", () => {
+	beforeEach(() => {
 
-		it("should return typing info", () => {
+		collectTypeProfileSpy = sinon.spy(typeProfiler, 'collectTypeProfile')
 
-			const script = `((num) => {
-							return num;
-							})(2);`;
+	});
 
+	const typeProfiler = new TypeProfiler(),
+		req = {
+			params: {
+				script: ""
+			}
+		},
+		res = {
+			send: () => {}
+		}
 
+	describe("when started", () => {
 
-			typeProfiler.start(script).then((result) => {
+		it("should make sure a JS script is included in its request", (done) => {
 
-				console.log(typeof result);
+			req.params.script = "(function() {function foo(x) {if (x < 2) {return 42;}return `What are the return types of foo?`;}class Rectangle {};foo({});foo(1);foo(1.5);foo(`somestring`);foo(new Rectangle());})()";
 
-				// console.log(util.inspect(result, false, null, true));
+			return typeProfiler.start(req, res).then(() => {
+
+				expect(collectTypeProfileSpy).to.have.callCount(0);
+
+				done();
 
 			});
 

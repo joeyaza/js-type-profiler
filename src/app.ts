@@ -1,9 +1,19 @@
 'use strict';
-import {TypeProfiler} from './TypeProfiler/TypeProfiler';
-import * as http from "http";
+const TypeProfiler = require("./TypeProfiler/TypeProfiler");
 const typeProfiler = new TypeProfiler();
+import * as restify from "restify";
 
-// typeProfiler.start();
+const server = restify.createServer();
+server.use(restify.plugins.queryParser({
+    mapParams: true
+}));
+server.use(restify.plugins.bodyParser({
+    mapParams: true
+}));
 
-http.createServer(typeProfiler.server).listen(8080);
-console.log("Listening on localhost:8080");
+//@POST
+server.post('/', typeProfiler.start.bind(typeProfiler));
+
+server.listen(8080, () => {
+  console.log('%s listening at %s', server.name, server.url);
+});

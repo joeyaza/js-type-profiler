@@ -16,31 +16,15 @@ const inspectorSession = new InspectorSession_1.InspectorSession();
 class TypeProfiler {
     constructor() {
     }
-    start(script) {
-        if (!script) {
-            return this.readFile("dist/src/ex.js").then((script) => {
-                return this.collectTypeProfile(script).then((profile) => {
-                    const profileInfo = this.markUpCode(profile, script);
-                    return profileInfo;
-                });
+    start(req, res) {
+        const script = req.params.script;
+        console.log("here");
+        if (script) {
+            return this.collectTypeProfile(script).then((profile) => {
+                const profileInfo = this.markUpCode(profile, script);
+                res.send(profileInfo);
             });
         }
-        return this.collectTypeProfile(script).then((profile) => {
-            const profileInfo = this.markUpCode(profile, script);
-            return profileInfo;
-        });
-    }
-    readFile(fileName) {
-        return new Promise((resolve, reject) => {
-            fs.readFile(fileName, "utf8", (error, result) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(result);
-                }
-            });
-        });
     }
     collectTypeProfile(source) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -61,6 +45,9 @@ class TypeProfiler {
                     return typeResults.scriptId == scriptId;
                 });
             }
+            catch (error) {
+                return error;
+            }
             finally {
                 inspectorSession.disconnect();
             }
@@ -75,50 +62,6 @@ class TypeProfiler {
         }
         return source;
     }
-    getPostBody(request) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise(function (resolve) {
-                let body = "";
-                request.on('data', data => body += data);
-                request.on('end', end => resolve(query.parse(body)));
-            });
-        });
-    }
-    server(request, response) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log("here §§§§§");
-            let script = "", result = "", message_log = "", detailed = false, count = false;
-            if (request.method == 'POST') {
-                console.log("here !");
-                try {
-                    let post = yield this.getPostBody(request);
-                    script = post.script;
-                    let typeProfile = yield collectTypeProfile(script);
-                    result = markUpCode(typeProfile, script);
-                }
-                catch (error) {
-                    return error;
-                }
-            }
-            else {
-                console.log("hdkjhkdjhkdjkjd");
-                this.readFile("dist/src/ex.js").then((script) => {
-                    this.readFile("index.html").then((template) => {
-                        let html = [
-                            ["SCRIPT", script],
-                            ["RESULT", result]
-                        ].reduce((template, [pattern, replacement]) => {
-                            return template.replace(pattern, replacement);
-                        }, template);
-                        response.writeHead(200, {
-                            'Content-Type': 'text/html'
-                        });
-                        response.end(html);
-                    });
-                });
-            }
-        });
-    }
 }
-exports.TypeProfiler = TypeProfiler;
+module.exports = TypeProfiler;
 //# sourceMappingURL=TypeProfiler.js.map
