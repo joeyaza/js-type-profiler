@@ -20,12 +20,16 @@
     "@types/node": "^10.11.3",
     "@types/sinon": "^5.0.2",
     "@types/sinon-chai": "3.2.0",
+    "abstract-syntax-tree": "^1.0.2",
     "chai": "4.1.2",
+    "escodegen": "^1.11.0",
+    "markdownscript": "^1.3.0",
     "mocha": "^3.5.0",
     "restify": "^7.2.1",
     "restify-decorators": "0.0.3",
     "sinon": "^3.2.1",
     "sinon-chai": "^2.13.0",
+    "to-ast": "^1.0.0",
     "typescript": "*"
   }
 }

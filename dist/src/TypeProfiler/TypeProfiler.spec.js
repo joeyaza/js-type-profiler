@@ -4,26 +4,36 @@ const chai_1 = require("chai");
 const sinon = require("sinon");
 const sinonChai = require("sinon-chai");
 const TypeProfiler = require("./TypeProfiler");
-const typeProfiler = new TypeProfiler();
 chai_1.use(sinonChai);
+let collectTypeProfileSpy, typeProfiler, req, res;
 describe("TypeProfiler", () => {
-    let collectTypeProfileSpy;
     beforeEach(() => {
-        collectTypeProfileSpy = sinon.spy(typeProfiler, 'collectTypeProfile');
+        typeProfiler = new TypeProfiler(),
+            collectTypeProfileSpy = sinon.spy(typeProfiler, 'collectTypeProfile'),
+            req = {
+                params: {
+                    script: ""
+                }
+            },
+            res = {
+                send: () => { }
+            };
     });
-    const typeProfiler = new TypeProfiler(), req = {
-        params: {
-            script: ""
-        }
-    }, res = {
-        send: () => { }
-    };
     describe("when started", () => {
-        it("should make sure a JS script is included in its request", (done) => {
-            req.params.script = "(function() {function foo(x) {if (x < 2) {return 42;}return `What are the return types of foo?`;}class Rectangle {};foo({});foo(1);foo(1.5);foo(`somestring`);foo(new Rectangle());})()";
-            return typeProfiler.start(req, res).then(() => {
-                chai_1.expect(collectTypeProfileSpy).to.have.callCount(0);
-                done();
+        describe("when accurate js script is included in request", () => {
+            it("should collect type profile summary", () => {
+                req.params.script = "(function() {function foo(x) {if (x < 2) {return 42;}return `What are the return types of foo?`;}class Rectangle {};foo({});foo(1);foo(1.5);foo(`somestring`);foo(new Rectangle());})()";
+                return typeProfiler.start(req, res).then(() => {
+                    chai_1.expect(collectTypeProfileSpy).to.have.callCount(1);
+                });
+            });
+        });
+        describe("when incorrent js script is included in request", () => {
+            it("should throw error and not collect types", () => {
+                req.params.script = "(dhjskda fucntion Class(){`{{";
+                return typeProfiler.start(req, res).catch((error) => {
+                    chai_1.expect(collectTypeProfileSpy).to.have.callCount(0);
+                });
             });
         });
     });
