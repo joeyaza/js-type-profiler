@@ -20,15 +20,15 @@ class TypeProfiler {
 
 	  if (script) {
 
-	  	const astResp = this.isJavaScriptValid(script);
+	  	return this.isJavaScriptValid(script).then(() => {
 
-	  	// if (!astResp) throw Error("Your JavaScript is inaccurate, please try again...");
+	  		return this.collectTypeProfile(script).then((profile) => {
 
-	  	return this.collectTypeProfile(script).then((profile) => {
+	  			const profileInfo = this.markUpCode(profile, script);
 
-	  		const profileInfo = this.markUpCode(profile, script);
+	  			res.send(profileInfo);
 
-	  		res.send(profileInfo);
+	  		});
 
 	  	}).catch((error) => {
 
@@ -43,25 +43,19 @@ class TypeProfiler {
 
 	private isJavaScriptValid(script: string): any {
 
-		let ast;
+		return new Promise((resolve, reject) => {
 
-		try {
+			const ast = new AbstractSyntaxTree(script);
 
-			ast = new AbstractSyntaxTree(script);
+			if (!ast) return reject(Error);
 
-		} catch(error) {
+            return resolve(ast);
 
-			throw Error("Your JavaScript is inaccurate, please try again...");
-
-		}
-
-		return ast;
+		});
 
 	}
 
 	private async collectTypeProfile(source: string) : Promise<any> {
-
-		console.log("2");
 
 		let typeProfile;
 		

@@ -21,10 +21,11 @@ class TypeProfiler {
     start(req, res) {
         const script = req.params.script;
         if (script) {
-            const astResp = this.isJavaScriptValid(script);
-            return this.collectTypeProfile(script).then((profile) => {
-                const profileInfo = this.markUpCode(profile, script);
-                res.send(profileInfo);
+            return this.isJavaScriptValid(script).then(() => {
+                return this.collectTypeProfile(script).then((profile) => {
+                    const profileInfo = this.markUpCode(profile, script);
+                    res.send(profileInfo);
+                });
             }).catch((error) => {
                 res.send(error);
                 throw error;
@@ -32,18 +33,15 @@ class TypeProfiler {
         }
     }
     isJavaScriptValid(script) {
-        let ast;
-        try {
-            ast = new AbstractSyntaxTree(script);
-        }
-        catch (error) {
-            throw Error("Your JavaScript is inaccurate, please try again...");
-        }
-        return ast;
+        return new Promise((resolve, reject) => {
+            const ast = new AbstractSyntaxTree(script);
+            if (!ast)
+                return reject(Error);
+            return resolve(ast);
+        });
     }
     collectTypeProfile(source) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("2");
             let typeProfile;
             try {
                 inspectorSession.connect();

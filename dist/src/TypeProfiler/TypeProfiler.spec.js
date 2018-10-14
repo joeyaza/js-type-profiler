@@ -29,7 +29,7 @@ describe("TypeProfiler", () => {
             });
         });
         describe("when incorrect js script is included in request", () => {
-            it.only("should throw error and not collect types", () => {
+            it("should throw error and not collect types", () => {
                 req.params.script = "(dhjskda fucntion Class(){`{{";
                 return typeProfiler.start(req, res).catch((error) => {
                     chai_1.expect(collectTypeProfileSpy).to.have.callCount(0);
