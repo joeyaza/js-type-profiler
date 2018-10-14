@@ -28,11 +28,12 @@ describe("TypeProfiler", () => {
                 });
             });
         });
-        describe("when incorrent js script is included in request", () => {
-            it("should throw error and not collect types", () => {
+        describe("when incorrect js script is included in request", () => {
+            it.only("should throw error and not collect types", () => {
                 req.params.script = "(dhjskda fucntion Class(){`{{";
                 return typeProfiler.start(req, res).catch((error) => {
                     chai_1.expect(collectTypeProfileSpy).to.have.callCount(0);
+                    chai_1.expect(error).to.be.instanceof(Error);
                 });
             });
         });

@@ -9,29 +9,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const InspectorSession_1 = require("../InspectorSession/InspectorSession");
-const abstract_syntax_tree_1 = require("abstract-syntax-tree");
-const toAST = require('to-ast');
 const escodegen = require('escodegen');
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
 const inspectorSession = new InspectorSession_1.InspectorSession();
+const AbstractSyntaxTree = require('abstract-syntax-tree');
 class TypeProfiler {
     constructor() {
     }
     start(req, res) {
         const script = req.params.script;
-        console.log("here");
         if (script) {
-            console.log(">>>", this.isJavaScriptValid(script));
+            const astResp = this.isJavaScriptValid(script);
             return this.collectTypeProfile(script).then((profile) => {
                 const profileInfo = this.markUpCode(profile, script);
                 res.send(profileInfo);
+            }).catch((error) => {
+                res.send(error);
+                throw error;
             });
         }
     }
     isJavaScriptValid(script) {
-        const ast = new abstract_syntax_tree_1.AbstractSyntaxTree(script);
+        let ast;
+        try {
+            ast = new AbstractSyntaxTree(script);
+        }
+        catch (error) {
+            throw Error("Your JavaScript is inaccurate, please try again...");
+        }
         return ast;
     }
     collectTypeProfile(source) {

@@ -1,13 +1,12 @@
 import {InspectorSession} from '../InspectorSession/InspectorSession';
-import {AbstractSyntaxTree} from "abstract-syntax-tree";
 import { get } from 'restify-decorators'
 import * as restify from 'restify'
-const toAST = require('to-ast');
 const escodegen = require('escodegen');
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
 const inspectorSession = new InspectorSession();
+const AbstractSyntaxTree = require('abstract-syntax-tree');
 
 class TypeProfiler {
 
@@ -19,17 +18,22 @@ class TypeProfiler {
 
 	  const script = req.params.script;
 
-	  console.log("here")
-
 	  if (script) {
 
-	  	console.log(">>>", this.isJavaScriptValid(script));
+	  	const astResp = this.isJavaScriptValid(script);
+
+	  	// if (!astResp) throw Error("Your JavaScript is inaccurate, please try again...");
 
 	  	return this.collectTypeProfile(script).then((profile) => {
 
 	  		const profileInfo = this.markUpCode(profile, script);
 
 	  		res.send(profileInfo);
+
+	  	}).catch((error) => {
+
+	  		res.send(error);
+	  		throw error;
 
 	  	});
 
@@ -39,7 +43,18 @@ class TypeProfiler {
 
 	private isJavaScriptValid(script: string): any {
 
-		const ast = new AbstractSyntaxTree(script);
+		let ast;
+
+		try {
+
+			ast = new AbstractSyntaxTree(script);
+
+		} catch(error) {
+
+			throw Error("Your JavaScript is inaccurate, please try again...");
+
+		}
+
 		return ast;
 
 	}
