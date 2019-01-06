@@ -9,20 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const InspectorSession_1 = require("../InspectorSession/InspectorSession");
+const util = require("util");
 const escodegen = require('escodegen');
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
-const inspectorSession = new InspectorSession_1.InspectorSession();
 const AbstractSyntaxTree = require('abstract-syntax-tree');
 class TypeProfiler {
     constructor() {
     }
     start(req, res) {
-        const script = req.params.script;
+        const script = req.body;
         if (script) {
             return this.isJavaScriptValid(script).then(() => {
                 return this.collectTypeProfile(script).then((profile) => {
+                    profile.forEach((profileItem) => {
+                        console.log(util.inspect(profileItem, { depth: 2 }));
+                    });
                     const profileInfo = this.markUpCode(profile, script);
                     res.send(profileInfo);
                 });
@@ -42,6 +45,7 @@ class TypeProfiler {
     }
     collectTypeProfile(source) {
         return __awaiter(this, void 0, void 0, function* () {
+            const inspectorSession = new InspectorSession_1.InspectorSession();
             let typeProfile;
             try {
                 inspectorSession.connect();

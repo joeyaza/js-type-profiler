@@ -4,9 +4,6 @@ const TypeProfiler = require("./TypeProfiler/TypeProfiler");
 const typeProfiler = new TypeProfiler();
 const restify = require("restify");
 const server = restify.createServer();
-server.use(restify.plugins.queryParser({
-    mapParams: true
-}));
 server.use(restify.plugins.bodyParser({
     mapParams: true
 }));

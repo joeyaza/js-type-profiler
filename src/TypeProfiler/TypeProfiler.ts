@@ -1,11 +1,11 @@
 import {InspectorSession} from '../InspectorSession/InspectorSession';
 import { get } from 'restify-decorators'
 import * as restify from 'restify'
+import * as util from "util";
 const escodegen = require('escodegen');
 const http = require('http');
 const query = require('querystring');
 const fs = require('fs');
-const inspectorSession = new InspectorSession();
 const AbstractSyntaxTree = require('abstract-syntax-tree');
 
 class TypeProfiler {
@@ -16,13 +16,19 @@ class TypeProfiler {
 
 	public start(req: any, res: any): Promise<any> {
 
-	  const script = req.params.script;
+	  const script = req.body;
 
 	  if (script) {
 
 	  	return this.isJavaScriptValid(script).then(() => {
 
 	  		return this.collectTypeProfile(script).then((profile) => {
+
+	  			profile.forEach((profileItem) => {
+
+					console.log(util.inspect(profileItem, {depth: 2}));
+
+	  			});
 
 	  			const profileInfo = this.markUpCode(profile, script);
 
@@ -57,6 +63,7 @@ class TypeProfiler {
 
 	private async collectTypeProfile(source: string) : Promise<any> {
 
+		const inspectorSession = new InspectorSession();
 		let typeProfile;
 		
 		try {

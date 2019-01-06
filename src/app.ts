@@ -4,9 +4,6 @@ const typeProfiler = new TypeProfiler();
 import * as restify from "restify";
 
 const server = restify.createServer();
-server.use(restify.plugins.queryParser({
-    mapParams: true
-}));
 server.use(restify.plugins.bodyParser({
     mapParams: true
 }));

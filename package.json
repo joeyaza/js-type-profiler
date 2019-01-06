@@ -4,7 +4,7 @@
   "description": "Collect runtime type information 😋 of your JavaScript code.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node dist/src/app.js",
     "test": "npm run tsc && mocha ./dist/src/*/*.spec.js",
     "tsc": "tsc",
     "dev": "tsc -w & nodemon dist/src/app.js"
