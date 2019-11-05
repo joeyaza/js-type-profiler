@@ -2,6 +2,7 @@ import {InspectorSession} from '../InspectorSession/InspectorSession';
 import { get } from 'restify-decorators'
 import * as restify from 'restify'
 import * as util from "util";
+import { throws } from 'assert';
 const escodegen = require('escodegen');
 const http = require('http');
 const query = require('querystring');
@@ -14,36 +15,37 @@ class TypeProfiler {
 
 	}
 
-	public start(req: any, res: any): Promise<any> {
+	public async start(req: any, res: any): Promise<any> {
 
 	  const script = req.body;
 
 	  if (script) {
 
-	  	return this.isJavaScriptValid(script).then(() => {
+		try {
 
-	  		return this.collectTypeProfile(script).then((profile) => {
+			await this.isJavaScriptValid(script);
 
-	  			profile.forEach((profileItem) => {
+			const profile = await this.collectTypeProfile(script);
 
-					console.log(util.inspect(profileItem, {depth: 2}));
+			profile.forEach(profileItem => {
+				
+				console.log(util.inspect(profileItem, {depth: 2}));
 
-	  			});
+			});
 
-	  			const profileInfo = this.markUpCode(profile, script);
+			const profileInfo = this.markUpCode(profile, script);
 
-	  			res.send(profileInfo);
+	  		res.send(profileInfo);
+			 
+		} catch(error) {
 
-	  		});
+			res.send(error);
+			throw error;
 
-	  	}).catch((error) => {
-
-	  		res.send(error);
-	  		throw error;
-
-	  	});
+		}
 
 	  }
+	
 
 	}
 
@@ -61,7 +63,7 @@ class TypeProfiler {
 
 	}
 
-	private async collectTypeProfile(source: string) : Promise<any> {
+	private async collectTypeProfile(source: string) : Promise<[]> {
 
 		const inspectorSession = new InspectorSession();
 		let typeProfile;

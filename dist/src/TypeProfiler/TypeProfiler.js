@@ -19,21 +19,24 @@ class TypeProfiler {
     constructor() {
     }
     start(req, res) {
-        const script = req.body;
-        if (script) {
-            return this.isJavaScriptValid(script).then(() => {
-                return this.collectTypeProfile(script).then((profile) => {
-                    profile.forEach((profileItem) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const script = req.body;
+            if (script) {
+                try {
+                    yield this.isJavaScriptValid(script);
+                    const profile = yield this.collectTypeProfile(script);
+                    profile.forEach(profileItem => {
                         console.log(util.inspect(profileItem, { depth: 2 }));
                     });
                     const profileInfo = this.markUpCode(profile, script);
                     res.send(profileInfo);
-                });
-            }).catch((error) => {
-                res.send(error);
-                throw error;
-            });
-        }
+                }
+                catch (error) {
+                    res.send(error);
+                    throw error;
+                }
+            }
+        });
     }
     isJavaScriptValid(script) {
         return new Promise((resolve, reject) => {
