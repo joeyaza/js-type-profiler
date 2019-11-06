@@ -1,6 +1,6 @@
-const inspector = require('inspector');
+import * as inspector from "inspector";
 
-export class InspectorSession extends inspector.Session {
+class InspectorSession extends inspector.Session {
 
   constructor() {
 
@@ -10,25 +10,19 @@ export class InspectorSession extends inspector.Session {
 
   public postAsync(...args): Promise<any> {
 
-    let session = this;
+    let session: any = this;
 
     return new Promise((resolve, reject) => {
 
-      session.post(...args, (error, result) => {
+      session.post(...args, (error: Error, result: any) => {
 
-        if (error !== null) {
+        if (error || result.exceptionDetails) {
 
-          reject(error);
-
-        } else if (result.exceptionDetails !== undefined) {
-
-          reject(result.exceptionDetails.exception.description);
-
-        } else {
-
-          resolve(result);
+          return reject(error || result.exceptionDetails.exception.description);
 
         }
+
+        return resolve(result);
 
       });
 
@@ -38,3 +32,5 @@ export class InspectorSession extends inspector.Session {
 
 
 }
+
+export default InspectorSession;

@@ -1,13 +1,6 @@
-import {InspectorSession} from '../InspectorSession/InspectorSession';
-import { get } from 'restify-decorators'
-import * as restify from 'restify'
+import InspectorSession from '../InspectorSession/InspectorSession';
 import * as util from "util";
-import { throws } from 'assert';
-const escodegen = require('escodegen');
-const http = require('http');
-const query = require('querystring');
-const fs = require('fs');
-const AbstractSyntaxTree = require('abstract-syntax-tree');
+import {parse} from "abstract-syntax-tree";
 
 class TypeProfiler {
 
@@ -17,19 +10,19 @@ class TypeProfiler {
 
 	public async start(req: any, res: any): Promise<any> {
 
-	  const script = req.body;
+	  const script = req.body.script;
 
 	  if (script) {
 
 		try {
 
-			await this.isJavaScriptValid(script);
+			this.isJavaScriptValid(script);
 
 			const profile = await this.collectTypeProfile(script);
 
 			profile.forEach(profileItem => {
 				
-				console.log(util.inspect(profileItem, {depth: 2}));
+				//console.log(util.inspect(profileItem, {depth: 2}));
 
 			});
 
@@ -49,19 +42,23 @@ class TypeProfiler {
 
 	}
 
-	private isJavaScriptValid(script: string): any {
 
-		return new Promise((resolve, reject) => {
+	private isJavaScriptValid(script: string): Error | boolean {
 
-			const ast = new AbstractSyntaxTree(script);
+		try {
 
-			if (!ast) return reject(Error);
+			parse(script);
 
-            return resolve(ast);
+		} catch {
 
-		});
+			throw new Error("Invalid JavaScript, please try again!");
+
+		}
+
+		return true;
 
 	}
+
 
 	private async collectTypeProfile(source: string) : Promise<[]> {
 
@@ -70,7 +67,7 @@ class TypeProfiler {
 		
 		try {
 
-		 inspectorSession.connect();
+		 	inspectorSession.connect();
 
 			await inspectorSession.postAsync('Runtime.enable');
 			await inspectorSession.postAsync('Profiler.enable');
@@ -98,7 +95,7 @@ class TypeProfiler {
 
 		} finally {
 
-		 inspectorSession.disconnect();
+		 	inspectorSession.disconnect();
 
 		}
 
@@ -124,4 +121,4 @@ class TypeProfiler {
 }
 
 
-module.exports = TypeProfiler;
+export default TypeProfiler;

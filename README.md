@@ -6,3 +6,6 @@ Very early stage, and not properly working but a work in progress.
 
 😍😍😍
 
+UPDATE 0CT 2019: with the new versions of Node (> v.12) and some tweaking it all seems to work
+😜🐱‍🐉🐱‍🐉🐱‍🐉
+

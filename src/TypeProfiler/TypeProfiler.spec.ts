@@ -3,14 +3,14 @@ import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
 import * as util from "util";
 
-const TypeProfiler = require("./TypeProfiler");
+import TypeProfiler from "./TypeProfiler";
 
 use(sinonChai);
 
 let collectTypeProfileSpy,
-typeProfiler,
-req,
-res;
+	typeProfiler,
+	req,
+	res;
 
 
 describe("TypeProfiler", () => {
@@ -20,7 +20,7 @@ describe("TypeProfiler", () => {
 		typeProfiler = new TypeProfiler(),
 		collectTypeProfileSpy = sinon.spy(typeProfiler, 'collectTypeProfile'),
 		req = {
-			params: {
+			body: {
 				script: ""
 			}
 		},
@@ -35,32 +35,34 @@ describe("TypeProfiler", () => {
 
 		describe("when accurate js script is included in request", () => {
 
-			it("should collect type profile summary", () => {
+			it("should collect type profile summary", async () => {
 
-				req.params.script = "(function() {function foo(x) {if (x < 2) {return 42;}return `What are the return types of foo?`;}class Rectangle {};foo({});foo(1);foo(1.5);foo(`somestring`);foo(new Rectangle());})()";
+				req.body.script = "(function() {function foo(x) {if (x < 2) {return 42;}return `What are the return types of foo?`;}class Rectangle {};foo({});foo(1);foo(1.5);foo(`somestring`);foo(new Rectangle());})()";
 
-				return typeProfiler.start(req, res).then(() => {
+				await typeProfiler.start(req, res);
 
-					expect(collectTypeProfileSpy).to.have.callCount(1);
-
-				});
-
+				expect(collectTypeProfileSpy).to.have.callCount(1);
+		
 			});
 
 		});
 
 		describe("when incorrect js script is included in request", () => {
 
-			it("should throw error and not collect types", () => {
+			it("should throw error and not collect types", async () => {
 
-				req.params.script = "(dhjskda fucntion Class(){`{{";
+				req.body.script = "(dhjskda fucntion Class(){`{{";
 
-				return typeProfiler.start(req, res).catch((error) => {
+				try {
+
+					await typeProfiler.start(req, res);
+
+				} catch(error) {
 
 					expect(collectTypeProfileSpy).to.have.callCount(0);
 					expect(error).to.be.instanceof(Error);
 
-				});
+				}
 
 			});
 

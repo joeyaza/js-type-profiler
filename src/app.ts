@@ -1,9 +1,9 @@
-'use strict';
-const TypeProfiler = require("./TypeProfiler/TypeProfiler");
-const typeProfiler = new TypeProfiler();
+import TypeProfiler from "./TypeProfiler/TypeProfiler";
 import * as restify from "restify";
 
-const server = restify.createServer();
+const typeProfiler = new TypeProfiler(),
+    server = restify.createServer();
+    
 server.use(restify.plugins.bodyParser({
     mapParams: true
 }));

@@ -1,9 +1,8 @@
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const TypeProfiler = require("./TypeProfiler/TypeProfiler");
-const typeProfiler = new TypeProfiler();
+const TypeProfiler_1 = require("./TypeProfiler/TypeProfiler");
 const restify = require("restify");
-const server = restify.createServer();
+const typeProfiler = new TypeProfiler_1.default(), server = restify.createServer();
 server.use(restify.plugins.bodyParser({
     mapParams: true
 }));

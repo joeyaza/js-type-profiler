@@ -9,24 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const InspectorSession_1 = require("../InspectorSession/InspectorSession");
-const util = require("util");
-const escodegen = require('escodegen');
-const http = require('http');
-const query = require('querystring');
-const fs = require('fs');
-const AbstractSyntaxTree = require('abstract-syntax-tree');
+const abstract_syntax_tree_1 = require("abstract-syntax-tree");
 class TypeProfiler {
     constructor() {
     }
     start(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const script = req.body;
+            const script = req.body.script;
             if (script) {
                 try {
-                    yield this.isJavaScriptValid(script);
+                    this.isJavaScriptValid(script);
                     const profile = yield this.collectTypeProfile(script);
                     profile.forEach(profileItem => {
-                        console.log(util.inspect(profileItem, { depth: 2 }));
                     });
                     const profileInfo = this.markUpCode(profile, script);
                     res.send(profileInfo);
@@ -39,16 +33,17 @@ class TypeProfiler {
         });
     }
     isJavaScriptValid(script) {
-        return new Promise((resolve, reject) => {
-            const ast = new AbstractSyntaxTree(script);
-            if (!ast)
-                return reject(Error);
-            return resolve(ast);
-        });
+        try {
+            abstract_syntax_tree_1.parse(script);
+        }
+        catch (_a) {
+            throw new Error("Invalid JavaScript, please try again!");
+        }
+        return true;
     }
     collectTypeProfile(source) {
         return __awaiter(this, void 0, void 0, function* () {
-            const inspectorSession = new InspectorSession_1.InspectorSession();
+            const inspectorSession = new InspectorSession_1.default();
             let typeProfile;
             try {
                 inspectorSession.connect();
@@ -84,5 +79,5 @@ class TypeProfiler {
         return source;
     }
 }
-module.exports = TypeProfiler;
+exports.default = TypeProfiler;
 //# sourceMappingURL=TypeProfiler.js.map

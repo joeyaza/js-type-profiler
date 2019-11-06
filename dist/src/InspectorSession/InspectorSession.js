@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const inspector = require('inspector');
+const inspector = require("inspector");
 class InspectorSession extends inspector.Session {
     constructor() {
         super();
@@ -9,18 +9,13 @@ class InspectorSession extends inspector.Session {
         let session = this;
         return new Promise((resolve, reject) => {
             session.post(...args, (error, result) => {
-                if (error !== null) {
-                    reject(error);
+                if (error || result.exceptionDetails) {
+                    return reject(error || result.exceptionDetails.exception.description);
                 }
-                else if (result.exceptionDetails !== undefined) {
-                    reject(result.exceptionDetails.exception.description);
-                }
-                else {
-                    resolve(result);
-                }
+                return resolve(result);
             });
         });
     }
 }
-exports.InspectorSession = InspectorSession;
+exports.default = InspectorSession;
 //# sourceMappingURL=InspectorSession.js.map

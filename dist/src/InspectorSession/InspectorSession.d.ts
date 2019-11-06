@@ -1,6 +1,6 @@
-declare const inspector: any;
-export declare class InspectorSession extends inspector.Session {
+import * as inspector from "inspector";
+declare class InspectorSession extends inspector.Session {
     constructor();
     postAsync(...args: any[]): Promise<any>;
 }
-export {};
+export default InspectorSession;
