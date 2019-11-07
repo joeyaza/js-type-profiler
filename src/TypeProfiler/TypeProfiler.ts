@@ -8,7 +8,7 @@ class TypeProfiler {
 
 	}
 
-	public async start(req: any, res: any): Promise<any> {
+	public async start(req: {body: {script: string}}, res: {send}): Promise<any> {
 
 	  const script = req.body.script;
 
@@ -103,13 +103,15 @@ class TypeProfiler {
 
 	}
 
-	private markUpCode(entries: any, source:string): string {
+	private markUpCode(entries: any, source: string): string {
 
 		entries = entries.sort((a, b) => b.offset - a.offset);
 
 		for (let entry of entries) {
 
-			source = source.slice(0, entry.offset) + entry.types +
+			const typesStr = JSON.stringify(entry.types);
+
+			source = source.slice(0, entry.offset) + typesStr +
 				source.slice(entry.offset);
 
 		}

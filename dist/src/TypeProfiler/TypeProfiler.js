@@ -73,7 +73,8 @@ class TypeProfiler {
     markUpCode(entries, source) {
         entries = entries.sort((a, b) => b.offset - a.offset);
         for (let entry of entries) {
-            source = source.slice(0, entry.offset) + entry.types +
+            const typesStr = JSON.stringify(entry.types);
+            source = source.slice(0, entry.offset) + typesStr +
                 source.slice(entry.offset);
         }
         return source;

@@ -1,16 +1,10 @@
-import {expect, use} from "chai";
-import * as sinon from "sinon";
-import * as sinonChai from "sinon-chai";
-import * as util from "util";
-
 import TypeProfiler from "./TypeProfiler";
-
-use(sinonChai);
 
 let collectTypeProfileSpy,
 	typeProfiler,
 	req,
-	res;
+	res,
+	resSendSpy;
 
 
 describe("TypeProfiler", () => {
@@ -18,7 +12,7 @@ describe("TypeProfiler", () => {
 	beforeEach(() => {
 
 		typeProfiler = new TypeProfiler(),
-		collectTypeProfileSpy = sinon.spy(typeProfiler, 'collectTypeProfile'),
+		collectTypeProfileSpy = jest.spyOn(typeProfiler, 'collectTypeProfile'),
 		req = {
 			body: {
 				script: ""
@@ -27,7 +21,7 @@ describe("TypeProfiler", () => {
 		res = {
 			send: () => {}
 		};
-
+		resSendSpy = jest.spyOn(res, 'send');
 	});
 
 
@@ -41,7 +35,8 @@ describe("TypeProfiler", () => {
 
 				await typeProfiler.start(req, res);
 
-				expect(collectTypeProfileSpy).to.have.callCount(1);
+				expect(collectTypeProfileSpy).toHaveBeenCalledTimes(1);
+				expect(typeof resSendSpy.mock.calls[0][0]).toBe("string");
 		
 			});
 
@@ -59,8 +54,8 @@ describe("TypeProfiler", () => {
 
 				} catch(error) {
 
-					expect(collectTypeProfileSpy).to.have.callCount(0);
-					expect(error).to.be.instanceof(Error);
+					expect(collectTypeProfileSpy).toBeCalledTimes(0);
+					expect(error).toBeInstanceOf(Error);
 
 				}
 

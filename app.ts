@@ -1,4 +1,4 @@
-import TypeProfiler from "./TypeProfiler/TypeProfiler";
+import TypeProfiler from "./src/TypeProfiler/TypeProfiler";
 import * as restify from "restify";
 
 const typeProfiler = new TypeProfiler(),
